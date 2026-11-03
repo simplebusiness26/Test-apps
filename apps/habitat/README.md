@@ -35,3 +35,5 @@ The existing AISO bridge is GitHub Actions in `simplebusiness26/agentCart`, wher
 `scripts/deploy.mjs` restricts mutations to Worker `habitat-pilot` and D1 `habitat-pilot`; it never prints credentials. It resolves the account's actual workers.dev subdomain, applies idempotent schema, uploads modules, enables the subdomain,  and verifies the deployed source hash. Re-deploy by pinning the reviewed new SHA in the bridge launcher. Source changes do not silently auto-deploy.
 
 See [BUILD_PLAN.md](BUILD_PLAN.md), [engineering](docs/ENGINEERING.md), [privacy](docs/PRIVACY.md), [housing requirements](docs/HOUSING.md) and [verification](docs/VERIFICATION.md).
+
+Case details now offer a printable evidence/history pack with private images and their SHA-256 digests. Use the browser's Print / save PDF destination. Managers can delete the current synthetic workspace from Reports after explicit acknowledgement; exported/printed copies and provider recovery retention are separate.

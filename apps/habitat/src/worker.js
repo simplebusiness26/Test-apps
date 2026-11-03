@@ -42,6 +42,11 @@ async function route(req,env){const url=new URL(req.url),path=url.pathname,metho
   const u=await identity(req,db);
   if(method==='POST')await limit(db,'write:'+u.org,200);
   if(path==='/api/logout'&&method==='POST'){const raw=(req.headers.get('Cookie')||'').match(/habitat=([a-f0-9]{64})/)?.[1];if(raw)await query(db,'DELETE FROM sessions WHERE hash=?',await hash(raw)).run();return json({ok:true},200,{'Set-Cookie':cookie('',0)});}
+  if(path==='/api/workspace/delete'&&method==='POST'){
+    manager(u);const b=await input(req);if(b.confirm!=='DELETE SYNTHETIC WORKSPACE')fail(400,'Explicit workspace deletion confirmation required');
+    await query(db,'DELETE FROM organisations WHERE id=?',u.org).run();
+    return json({ok:true},200,{'Set-Cookie':cookie('',0)});
+  }
   if(path==='/api/me'&&method==='GET')return json({role:u.role,expires:u.org_expires});
   if(path==='/api/properties'&&method==='GET'){const rows=await query(db,'SELECT id,label FROM properties WHERE org=? AND (?=\'manager\' OR resident=?)',u.org,u.role,u.id).all();return json(rows.results);}
   if(path==='/api/reports'&&method==='GET'){const rows=await query(db,'SELECT r.id,r.title,r.room,r.status,r.urgent,r.created,p.label FROM reports r JOIN properties p ON p.id=r.property WHERE p.org=? AND (?=\'manager\' OR p.resident=?) ORDER BY r.created DESC LIMIT 100',u.org,u.role,u.id).all();return json(rows.results);}

@@ -58,3 +58,6 @@ Acceptance: calibrated model outperforms baseline on held-out weeks, transparent
 
 ## Working rules
 Never commit secrets, real images, tenant data or production dumps to this public repo. Keep AISO/Niches/Xplorer resources untouched. Use bridge access that is actually verified. A successful upload is a deployment, not proof that a user journey works. Mark blockers explicitly and maintain the verification record on each release.
+
+## Continuation increment — 3 November 2026
+Implemented printable case packs (including derivative evidence manifest) and manager-confirmed synthetic-workspace deletion with role/origin checks and session/key revocation. Thirteen local tests pass; see verification ledger for live status. These complete part of Stage 3 export and part of Stage 2 deletion work, but do not complete either stage or authorise personal data.

@@ -6,3 +6,20 @@ const upload=await a(path+'/photos',{}, {body:new Uint8Array([255,216,1,2,255,21
 const otherKeys=(await stranger('/demo',{synthetic:true})).data;await stranger('/login',{key:otherKeys.managerKey});assert.equal((await stranger(path)).status,404);assert.equal((await stranger('/reports',{property:p[0].id,title:'x',room:'x',description:'x'})).status,404);
 await b('/login',{key:keys.managerKey});assert.equal((await b('/properties')).data.length,2);assert.equal((await b(path+'/events',{kind:'reviewed',note:'premature'})).status,409);for(const kind of ['inspection','repair-planned','repair-completed','reviewed'])assert.equal((await b(path+'/events',{kind,note:'Synthetic '+kind})).status,200);assert.equal((await a(path)).data.report.status,'closed');assert.equal((await a(path+'/events',{kind:'reopened',note:'Recurrence'})).status,200);const out=await b(path+'/export');assert.equal(out.data.events.length,6);assert.equal(out.data.report.status,'reported');assert.ok(out.data.report.analysis.margin<0);assert.equal((await a('/logout',{})).status,200);assert.equal((await a('/me')).status,401);await DB.prepare('UPDATE organisations SET expires=0').run();assert.equal((await b('/me')).status,401);await worker.scheduled(null,{DB});assert.equal((await DB.prepare('SELECT count(*) n FROM reports').first()).n,0);DB.close();});
 test('Origin and XSS protections, malformed inputs',async()=>{const DB=database(),c=client(DB);assert.equal((await c('/demo',{synthetic:true},{headers:{Origin:'https://evil.test'}})).status,403);const r=await c('/health');assert.ok(r.headers.get('Content-Security-Policy').includes("frame-ancestors 'none'"));assert.equal(r.headers.get('Cache-Control'),'no-store');DB.close();});
+
+test('Workspace deletion requires manager confirmation, cascades evidence and revokes all sessions without affecting another organisation',async()=>{
+ const DB=database(),resident=client(DB),manager=client(DB),other=client(DB);
+ const keys=(await resident('/demo',{synthetic:true})).data;
+ const otherKeys=(await other('/demo',{synthetic:true})).data;
+ await resident('/login',{key:keys.residentKey});await manager('/login',{key:keys.managerKey});await other('/login',{key:otherKeys.managerKey});
+ const p=(await resident('/properties')).data[0];const r=(await resident('/reports',{property:p.id,title:'Delete fixture',room:'Fictional',description:'Synthetic'})).data;
+ await DB.prepare('INSERT INTO photos VALUES(?,?,?,?,?)').bind('fixture-photo',r.id,[255,216,255,217],'fixture-digest',Date.now()).run();
+ assert.equal((await resident('/workspace/delete',{confirm:'DELETE SYNTHETIC WORKSPACE'})).status,403);
+ assert.equal((await manager('/workspace/delete',{})).status,400);
+ assert.equal((await manager('/workspace/delete',{confirm:'DELETE SYNTHETIC WORKSPACE'},{headers:{Origin:'https://other.test'}})).status,403);
+ assert.equal((await manager('/workspace/delete',{confirm:'DELETE SYNTHETIC WORKSPACE'})).status,200);
+ assert.equal((await resident('/me')).status,401);assert.equal((await manager('/me')).status,401);
+ assert.equal((await resident('/login',{key:keys.residentKey})).status,401);assert.equal((await manager('/login',{key:keys.managerKey})).status,401);
+ for(const table of ['reports','photos','events'])assert.equal((await DB.prepare(`SELECT count(*) n FROM ${table}`).first()).n,0);
+ assert.equal((await DB.prepare('SELECT count(*) n FROM organisations').first()).n,1);assert.equal((await other('/me')).status,200);assert.equal((await other('/properties')).data.length,2);DB.close();
+});

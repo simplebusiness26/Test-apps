@@ -16,3 +16,13 @@ Local Playwright passed the complete journey, real generated-image upload, unaut
 - Latest local suite: 12 passing tests, including an independent higher-accuracy vapour-pressure equation inverted by bisection at 15 conditions (<0.1°C dew-point difference).
 
 Run 41572295556: deployment and mobile browser verification passed again for source bd5555e. The additional Python HTTP-client test received a non-JSON upstream 403 before reaching application logic; it is replaced by equivalent checks in independent real browser contexts. This does not count as a passed isolation check.
+
+## Continuation — 3 November 2026
+The previous run 41572510726 deployed c654e01 but its browser test failed at the immediate image `complete` assertion, before isolation checks. Image verification now awaits successful decoding and still rejects corrupt/unavailable images.
+
+Implemented in this continuation:
+- Printable case pack with measurements, model limitations, history and private derivative-image SHA-256 manifest; browser print/save-PDF after images decode.
+- Explicit manager-confirmed deletion of the current synthetic workspace; cascading reports/photos/history/identities/sessions, clearing credentials from UI memory on logout/deletion.
+- Browser journey covers separate-organisation denials, printable evidence pack and deletion; no test credentials are logged or committed.
+- Local build and 13 tests pass. New deletion test covers resident denial, missing confirmation, foreign-origin rejection, cascade, old-key/session revocation and survival of a second organisation.
+Live verification for this change is pending the isolated bridge run. Real-user release gates and automatic retention limitations remain in effect.
