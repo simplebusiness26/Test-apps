@@ -26,3 +26,14 @@ Implemented in this continuation:
 - Browser journey covers separate-organisation denials, printable evidence pack and deletion; no test credentials are logged or committed.
 - Local build and 13 tests pass. New deletion test covers resident denial, missing confirmation, foreign-origin rejection, cascade, old-key/session revocation and survival of a second organisation.
 Live verification for this change is pending the isolated bridge run. Real-user release gates and automatic retention limitations remain in effect.
+
+
+## Verified continuation release
+- Final source `cc7c42b980e72add00d1ac3db90e7eb04dcfcc5e`, deployed via isolated bridge run [41574537130](https://github.com/simplebusiness26/agentCart/actions/runs/41574537130): **SUCCESS**, all steps green.
+- Live URL: https://habitat-pilot.ai-seo.workers.dev/
+- Bridge build and all 13 Node/SQLite/engineering tests passed; Cloudflare deployment verified live D1 health and exact source hash.
+- Live Chromium journey passed: resident login/report/calculation, generated image re-encoding/upload/decoded retrieval, anonymous denial, separate-organisation report/export/image denial, resident denial of manager action, manager inspection/repair/review, JSON export, printable case pack with images/digests, print stylesheet and PDF rendering, simulation, manager-confirmed workspace deletion and revoked session.
+- Report and case-pack layouts checked at 320/390/430/1280 pixels. No page exceptions. Physical Android/iOS, print-destination UI and accessibility audit remain unverified.
+- The initial continuation run 41574226939 proved live isolation but found the new case-pack handler in the wrong scope; corrected by 89543ce and verified by both 41574474744 and the final run. No failures were suppressed.
+- No paid dependency added; only dedicated HABITAT Worker/D1 and the existing isolated bridge launcher changed. Artifact upload remains omitted due to existing GitHub quota.
+- Still synthetic-only: verified identity/recovery/MFA, server-side image sanitisation, guaranteed automatic retention cleanup, operator/legal/privacy review, notifications, restore tests and field-calibrated multi-room digital twin remain incomplete. Manual synthetic deletion is not a complete production retention programme.
