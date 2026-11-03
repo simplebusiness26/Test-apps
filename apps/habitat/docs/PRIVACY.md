@@ -1,0 +1,11 @@
+# Synthetic pilot threat model
+
+No real personal data is authorised. The UI requires a fictional-data acknowledgement; this is a policy gate, not a technical classifier capable of recognising real photographs. Do not market this as production-ready privacy compliance.
+
+Assets are public; all property/report/photo/export data require an expiring server session. Each demo provisions a separate organisation and independent 256-bit resident/manager keys. Only key hashes are stored. A resident sees one assigned home. A manager sees homes only in their organisation. Ownership is derived server-side; client-supplied roles or organisations are ignored. Access keys are bearer credentials and the creator knows both roles: these are demo identities, not verified people.
+
+Mutations require exact same-origin Origin headers. Cookies are HttpOnly/Secure/SameSite=Strict. API responses and images use no-store; CSP disallows inline scripts and framing. SQL is parameterised. Reports/text are escaped in UI. Sessions expire after 12 hours and are revoked on logout. Workspace expiry is checked for all authenticated access; daily cron cascades deletion after 7 days. Cloudflare recovery retention may retain deleted bytes for a limited provider period; no promise of immediate erasure from provider backups.
+
+Evidence: browser canvas derives JPEGs without original embedded metadata; server enforces size, media type and JPEG markers, but does not fully decode or inspect malicious payloads. Only authenticated inline image/jpeg retrieval is allowed. SHA-256 records the stored derivative. Original names are not stored. Max 3 images/report, 50 reports/workspace, 100 workspaces; hourly provisioning/login/write limits. Caps are pilot controls, not a proven distributed denial-of-service defence. Global quotas can still affect other free-tier applications; no paid auto-upgrade is configured.
+
+Limitations: no verified email, recovery, MFA, fine-grained membership administration, per-session dashboard, server-side image sanitisation, formal DPIA, published operator identity/rights contact, restore drill or third-party security audit. Actions are append-only through API, not cryptographically immutable against a database administrator. Plan notes hold dates/assignees as text, not enforceable work-order deadlines.
