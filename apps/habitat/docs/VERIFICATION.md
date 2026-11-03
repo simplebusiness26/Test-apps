@@ -37,3 +37,7 @@ Live verification for this change is pending the isolated bridge run. Real-user 
 - The initial continuation run 41574226939 proved live isolation but found the new case-pack handler in the wrong scope; corrected by 89543ce and verified by both 41574474744 and the final run. No failures were suppressed.
 - No paid dependency added; only dedicated HABITAT Worker/D1 and the existing isolated bridge launcher changed. Artifact upload remains omitted due to existing GitHub quota.
 - Still synthetic-only: verified identity/recovery/MFA, server-side image sanitisation, guaranteed automatic retention cleanup, operator/legal/privacy review, notifications, restore tests and field-calibrated multi-room digital twin remain incomplete. Manual synthetic deletion is not a complete production retention programme.
+
+
+## Homepage explanation release — 3 November 2026
+Source `96ab1f2d116c03d55f8c9dbfe9c9a1ee7e11c872` deployed and verified by bridge run [41575257805](https://github.com/simplebusiness26/agentCart/actions/runs/41575257805): SUCCESS. Expanded benefits, current use cases, intended audiences, future roadmap and five-step demo/access-key walkthrough. No standard signup is claimed. All 13 automated tests and full live browser journey passed, with homepage overflow checks at 320/390/430/1280 pixels. First run stopped on an ambiguous text locator introduced by quoting the login label in the walkthrough; exact control matching corrected it without suppressing an application failure.
