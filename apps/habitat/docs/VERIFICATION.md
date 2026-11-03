@@ -6,3 +6,5 @@
 - Browser and live verification: recorded in subsequent release entry and bridge Actions logs. Do not infer live success from this entry.
 - The local SQLite adapter is not the Cloudflare D1 runtime. A live browser test must establish D1 compatibility, cookies, image delivery and the deployed user journey.
 - Not independently field-validated; no physical-device or professional security/accessibility review. Synthetic pilot only.
+
+Local Playwright passed the complete journey, real generated-image upload, unauthorized image denial, role change, export and simulation at widths 320/390/430/1280. Initial bridge run 41571913239 deployed source 7abd614 but failed adding a Cron Trigger (10072), so live browser checks were skipped. Corrected deployment uses immediate access expiry plus provisioning-triggered cleanup; no other app cron was altered.

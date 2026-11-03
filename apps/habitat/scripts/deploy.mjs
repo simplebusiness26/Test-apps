@@ -9,7 +9,7 @@ const databases=await cf('/d1/database?per_page=100');let db=databases.find(d=>d
 const sql=readFileSync('migrations/0001.sql','utf8');await cf('/d1/database/'+db.uuid+'/query','POST',{sql});
 const metadata={main_module:'worker.js',compatibility_date:'2025-11-01',bindings:[{type:'d1',name:'DB',id:db.uuid},{type:'plain_text',name:'BUILD_SHA',text:sha}]};
 const data=new FormData();data.set('metadata',new Blob([JSON.stringify(metadata)],{type:'application/json'}));for(const f of ['worker.js','engineering.js','assets.js'])data.set(f,new Blob([readFileSync('dist/'+f)],{type:'application/javascript+module'}),f);
-const result=await cf('/workers/scripts/'+name,'PUT',data);await cf('/workers/scripts/'+name+'/subdomain','POST',{enabled:true,previews_enabled:false});await cf('/workers/scripts/'+name+'/schedules','PUT',[{cron:'17 3 * * *'}]);
+const result=await cf('/workers/scripts/'+name,'PUT',data);await cf('/workers/scripts/'+name+'/subdomain','POST',{enabled:true,previews_enabled:false});// No new account-wide Cron Trigger: expiry is enforced on access and cleanup runs before provisioning.
 const url=`https://${name}.${sub.subdomain}.workers.dev`;
 console.log(JSON.stringify({url,commit:sha,worker:name,database:dbName,version:result.deployment_id||result.id}));
 if(process.env.GITHUB_ENV)appendFileSync(process.env.GITHUB_ENV,`HABITAT_URL=${url}\n`);

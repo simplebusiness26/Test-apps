@@ -27,6 +27,7 @@ async function route(req,env){const url=new URL(req.url),path=url.pathname,metho
   if(method==='POST'&&path==='/api/demo'){
     const b=await input(req);if(b.synthetic!==true)fail(400,'Confirm synthetic data only');
     await limit(db,'create:'+await hash(req.headers.get('CF-Connecting-IP')||'local'),5);
+    await db.batch([query(db,'DELETE FROM sessions WHERE expires<?',Date.now()),query(db,'DELETE FROM organisations WHERE expires<?',Date.now()),query(db,'DELETE FROM limits WHERE expires<?',Date.now())]);
     const count=await db.prepare('SELECT count(*) AS n FROM organisations').first();if(count.n>=100)fail(429,'Pilot capacity reached');
     const org=id(),resident=id(),mgr=id(),p=id(),now=Date.now(),residentKey=token(),managerKey=token();
     await db.batch([query(db,'INSERT INTO organisations VALUES(?,?,?)',org,now,now+7*86400000),query(db,'INSERT INTO identities VALUES(?,?,?,?)',resident,org,'resident',await hash(residentKey)),query(db,'INSERT INTO identities VALUES(?,?,?,?)',mgr,org,'manager',await hash(managerKey)),query(db,'INSERT INTO properties VALUES(?,?,?,?)',p,org,'Demo home · Flat 1',resident),query(db,'INSERT INTO properties VALUES(?,?,?,?)',id(),org,'Demo home · Flat 2',null)]);
