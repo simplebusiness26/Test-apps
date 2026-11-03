@@ -26,3 +26,5 @@ Convert w back to RH at evolving T. The model flags supersaturation rather than 
 
 ## Independent validation and limits
 Tests use a hand-calculated heat-loss fixture, known dew-point reference, exact saturation identities, monotonic cooling and a separately implemented explicit-Euler ODE integration (0.0001 h steps) against the analytic solver. This validates implementation consistency, not field predictive accuracy. Further release requires measured-data calibration, benchmark comparison and expert engineering review.
+
+An additional independent psychrometric test evaluates NPL's higher-accuracy Sonntag/Wexler vapour-pressure equation and numerically inverts it by bisection for 15 temperature/RH combinations. The implemented Magnus dew points agree within 0.1°C for those fixtures. This is equation validation, not field calibration.

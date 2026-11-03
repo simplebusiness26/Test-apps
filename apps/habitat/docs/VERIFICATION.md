@@ -8,3 +8,11 @@
 - Not independently field-validated; no physical-device or professional security/accessibility review. Synthetic pilot only.
 
 Local Playwright passed the complete journey, real generated-image upload, unauthorized image denial, role change, export and simulation at widths 320/390/430/1280. Initial bridge run 41571913239 deployed source 7abd614 but failed adding a Cron Trigger (10072), so live browser checks were skipped. Corrected deployment uses immediate access expiry plus provisioning-triggered cleanup; no other app cron was altered.
+
+## Live verification evidence
+- Run [41572110669](https://github.com/simplebusiness26/agentCart/actions/runs/41572110669), source `f6f8eb27c1b486920d7c6a1bc41af1872b2c65a2`: deployment and live mobile journey PASSED. Worker upload version `76202f3e89204b108894dc051667f072`. Job status was failure only because GitHub artifact storage quota prevented screenshot upload. No user data or other artifacts were deleted to make room.
+- Live Playwright exercised: create workspace, resident key login, write report, persisted calculation, browser-generated image re-encoding/upload/read, anonymous image denial, manager login, inspection/repair/review, resident case export, simulation, widths 320/390/430/1280, zero page exceptions.
+- Direct workspace network attempts to execute the live test were blocked by execution-network responses; successful live browser verification ran on the GitHub bridge runner, not the local environment. The public homepage was also inspected in the cloud browser.
+- Latest local suite: 12 passing tests, including an independent higher-accuracy vapour-pressure equation inverted by bisection at 15 conditions (<0.1°C dew-point difference).
+
+Run 41572295556: deployment and mobile browser verification passed again for source bd5555e. The additional Python HTTP-client test received a non-JSON upstream 403 before reaching application logic; it is replaced by equivalent checks in independent real browser contexts. This does not count as a passed isolation check.
