@@ -23,3 +23,17 @@ test('Workspace deletion requires manager confirmation, cascades evidence and re
  for(const table of ['reports','photos','events'])assert.equal((await DB.prepare(`SELECT count(*) n FROM ${table}`).first()).n,0);
  assert.equal((await DB.prepare('SELECT count(*) n FROM organisations').first()).n,1);assert.equal((await other('/me')).status,200);assert.equal((await other('/properties')).data.length,2);DB.close();
 });
+
+test('V2 priority is manager-only, auditable and retains the resident danger flag',async()=>{
+ const DB=database(),resident=client(DB),manager=client(DB),other=client(DB);
+ const keys=(await resident('/demo',{synthetic:true})).data;const otherKeys=(await other('/demo',{synthetic:true})).data;
+ await resident('/login',{key:keys.residentKey});await manager('/login',{key:keys.managerKey});await other('/login',{key:otherKeys.managerKey});
+ const property=(await resident('/properties')).data[0];const report=(await resident('/reports',{property:property.id,title:'Leak',room:'Kitchen',description:'Fictional',urgent:true})).data;
+ const path='/reports/'+report.id;assert.equal((await resident(path+'/priority',{priority:'routine',reason:'test'})).status,403);
+ assert.equal((await other(path+'/priority',{priority:'routine',reason:'test'})).status,404);
+ assert.equal((await manager(path+'/priority',{priority:'routine',reason:''})).status,400);
+ const updated=await manager(path+'/priority',{priority:'routine',reason:'Inspected'});assert.equal(updated.status,201);assert.equal(updated.data.possibleDanger,true);
+ assert.equal((await manager(path+'/priority',{priority:'emergency',reason:'New evidence'})).status,201);
+ const result=await resident(path);assert.equal(result.data.report.urgent,1);const history=result.data.events.filter(e=>e.kind==='priority-changed').map(e=>JSON.parse(e.note));
+ assert.deepEqual(history.map(e=>[e.from,e.to]),[['awaiting_assessment','routine'],['routine','emergency']]);DB.close();
+});
