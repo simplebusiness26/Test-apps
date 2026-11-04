@@ -1,5 +1,6 @@
 import assets from './assets.js';
 import {analyse,simulate,VERSION} from './engineering.js';
+import {initialAssessment,assessPriority} from './priority.js';
 const encoder=new TextEncoder();
 const id=()=>crypto.randomUUID();
 const token=()=>Array.from(crypto.getRandomValues(new Uint8Array(32)),n=>n.toString(16).padStart(2,'0')).join('');
@@ -56,9 +57,18 @@ async function route(req,env){const url=new URL(req.url),path=url.pathname,metho
     const r=id();await db.batch([query(db,'INSERT INTO reports(id,property,author,title,description,room,measurements,analysis,urgent,created) VALUES(?,?,?,?,?,?,?,?,?,?)',r,b.property,u.id,text(b.title,'Title',120),text(b.description,'Description'),text(b.room,'Room',80),analysis?JSON.stringify(b.measurements):null,analysis?JSON.stringify(analysis):null,b.urgent===true?1:0,Date.now()),event(db,r,u,'reported','Resident or manager recorded a synthetic housing concern. Not a legal hazard classification.')]);return json({id:r},201);
   }
   if(path==='/api/simulate'&&method==='POST'){try{return json(simulate(await input(req)));}catch(e){if(e instanceof Failure)throw e;fail(400,e.message);}}
-  const match=path.match(/^\/api\/reports\/([a-f0-9-]{36})(?:\/(events|photos|export))?$/);
+  const match=path.match(/^\/api\/reports\/([a-f0-9-]{36})(?:\/(events|photos|export|priority))?$/);
   if(match){const r=await report(db,u,match[1]),action=match[2];
     if(method==='GET'&&(!action||action==='export')){const events=await query(db,'SELECT e.id,e.kind,e.note,e.created,i.role FROM events e JOIN identities i ON i.id=e.actor WHERE e.report=? ORDER BY e.created,e.rowid',r.id).all(),photos=await query(db,'SELECT id,digest,created FROM photos WHERE report=?',r.id).all();return json({report:cleanReport(r),events:events.results,photos:photos.results,exportedAt:new Date().toISOString(),notice:'Synthetic pilot. Engineering scenarios are not medical or legal determinations.'},200,action?{'Content-Disposition':'attachment; filename="habitat-report.json"'}:{});}
+    if(method==='POST'&&action==='priority'){
+      manager(u);const b=await input(req);
+      const changes=await query(db,"SELECT note FROM events WHERE report=? AND kind='priority-changed' ORDER BY created,rowid",r.id).all();
+      const history=changes.results.map(x=>JSON.parse(x.note));
+      const state={...initialAssessment({possibleDanger:!!r.urgent}),priority:history.at(-1)?.to||'awaiting_assessment',history};
+      let next;try{next=assessPriority(state,{priority:b.priority,reason:b.reason,actorId:u.id,role:u.role,at:new Date().toISOString()});}catch(e){fail(400,e.message);}
+      await event(db,r.id,u,'priority-changed',JSON.stringify(next.history.at(-1))).run();
+      return json({priority:next.priority,possibleDanger:next.possibleDanger},201);
+    }
     if(method==='POST'&&action==='events'){
       const b=await input(req);const kinds=['inspection','repair-planned','repair-completed','reviewed','reopened','note'];if(!kinds.includes(b.kind))fail(400,'Unknown action');if(b.kind!=='note'&&b.kind!=='reopened')manager(u);
       const statuses={'inspection':'investigating','repair-planned':'repair planned','repair-completed':'awaiting review','reviewed':'closed','reopened':'reported'};
@@ -77,3 +87,4 @@ async function route(req,env){const url=new URL(req.url),path=url.pathname,metho
 }
 export default {async fetch(req,env){let response;try{response=await route(req,env);}catch(e){response=json({error:e instanceof Failure?e.message:'Service unavailable. Please retry; your unsaved form has not been cleared.'},e instanceof Failure?e.status:503);if(!(e instanceof Failure))console.error('HABITAT request failed',e.name);}
   const headers=new Headers(response.headers);headers.set('Cache-Control','no-store');headers.set('X-Content-Type-Options','nosniff');headers.set('Referrer-Policy','no-referrer');headers.set('X-Frame-Options','DENY');headers.set('Content-Security-Policy',"default-src 'self'; img-src 'self' blob:; style-src 'self'; script-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'none'; form-action 'self'");headers.set('Permissions-Policy','camera=(), microphone=(), geolocation=()');headers.set('Strict-Transport-Security','max-age=31536000');return new Response(response.body,{status:response.status,headers});},async scheduled(_,env){await env.DB.batch([query(env.DB,'DELETE FROM sessions WHERE expires<?',Date.now()),query(env.DB,'DELETE FROM organisations WHERE expires<?',Date.now()),query(env.DB,'DELETE FROM limits WHERE expires<?',Date.now())]);}};
+
