@@ -41,3 +41,7 @@ Live verification for this change is pending the isolated bridge run. Real-user 
 
 ## Homepage explanation release — 3 November 2026
 Source `96ab1f2d116c03d55f8c9dbfe9c9a1ee7e11c872` deployed and verified by bridge run [41575257805](https://github.com/simplebusiness26/agentCart/actions/runs/41575257805): SUCCESS. Expanded benefits, current use cases, intended audiences, future roadmap and five-step demo/access-key walkthrough. No standard signup is claimed. All 13 automated tests and full live browser journey passed, with homepage overflow checks at 320/390/430/1280 pixels. First run stopped on an ambiguous text locator introduced by quoting the login label in the walkthrough; exact control matching corrected it without suppressing an application failure.
+
+
+## V2 foundation — 4 November 2026
+On isolated `habitat-v2-foundation`, rewrote roadmap and added standalone priority assessment domain logic with tests. Local Node 24 build and all 15 Node/SQLite tests pass (13 existing, 2 new). The new module is deliberately not wired into the Worker, D1 or UI; these tests do not prove authorisation of a real endpoint. Source files were fetched through GitHub connector; no live deployment, browser test, Cloudflare check or V2 end-to-end test performed. Existing pilot remains synthetic-only. The model is not a legal rules engine and the role string requires server-side authorisation before integration.
